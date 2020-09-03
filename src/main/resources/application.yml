@@ -1,0 +1,7 @@
+keystore:
+  path: C:\Users\vatsalhirpara\Desktop\keystore.jks
+  password: 7600122499
+  certificate-alias: vatsal
+
+timestamp-authority:
+  url: http://sha256timestamp.ws.symantec.com/sha256/timestamp
