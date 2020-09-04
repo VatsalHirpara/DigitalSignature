@@ -31,76 +31,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/pdf")
 @Slf4j
 public class PdfResources {
-
-	private final PdfService pdfService;
 	private final SigningService signingService;
-
-	static String fileBasePath = "C:\\Users\\vatsalhirpara\\Downloads\\documentsign2\\documentsign2\\src\\main\\resources\\files\\";
-
+	
 	public PdfResources(PdfService pdfService, SigningService signingService) {
-		this.pdfService = pdfService;
 		this.signingService = signingService;
 	}
-
-	@GetMapping(value = "/export", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity exportPdf() {
-		try {
-//            byte[] pdfToSign = this.pdfService.generatePdf();
-
-			Path path = Paths.get(fileBasePath + "Schrodinger_Equation.pdf");
-			byte[] pdfToSign = Files.readAllBytes(path);
-
-			byte[] signedPdf = this.signingService.signPdf(pdfToSign);
-
-			return ResponseEntity.ok(signedPdf);
-		} catch (IOException e) {
-			log.error("Cannot generate PDF file", e);
-			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	@PostMapping(value = "/signpdf", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity signPdfDocument(@RequestParam("file") MultipartFile file)
-			throws IllegalStateException, IOException {
-
-		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-		Path path = Paths.get(fileBasePath + fileName);
-		try {
-			Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-//		Path path = Paths.get(fileBasePath + fileName);
-//	    byte[] data = Files.readAllBytes(path);
-
-		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/pdf/download/")
-				.path(fileName).toUriString();
-		return ResponseEntity.ok(fileDownloadUri);
-	}
-
-	@GetMapping("/download/{fileName:.+}")
-	public ResponseEntity<?> downloadFileFromLocal(@PathVariable String fileName) {
-		Path path = Paths.get(fileBasePath + fileName);
-		Resource resource = null;
-		try {
-			resource = new UrlResource(path.toUri());
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-				.body(resource);
-	}
-
+	
 	@PostMapping(value = "/sign", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity signPdf(@RequestParam("file") MultipartFile file) throws IllegalStateException, IOException {
-
 		try {
 			byte[] pdfToSign = file.getBytes();
 			byte[] signedPdf = this.signingService.signPdf(pdfToSign);
-			
-	
 			return ResponseEntity.ok(signedPdf);
 		} catch (IOException e) {
 			log.error("Cannot generate PDF file", e);
