@@ -32,11 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PdfResources {
 	private final SigningService signingService;
-	
-	public PdfResources(PdfService pdfService, SigningService signingService) {
+
+	public PdfResources(SigningService signingService) {
 		this.signingService = signingService;
 	}
-	
+
 	@PostMapping(value = "/sign", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity signPdf(@RequestParam("file") MultipartFile file) throws IllegalStateException, IOException {
 		try {
